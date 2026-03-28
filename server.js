@@ -4,7 +4,9 @@ const dotenv = require("dotenv");
 const mongoose = require("mongoose"); // 1. Added Mongoose
 const authRoutes = require("./routes/authRoutes");
 const newsRoutes = require("./routes/newsRoutes");
-const jobRoutes = require("./routes/jobRoutes"); // Added this line to include job routes
+const jobRoutes = require("./routes/jobRoutes");
+const contactRoutes = require("./routes/contactRoutes");
+const ApplicationsRoutes = require("./routes/applicationsRoutes"); // Import job routes
 dotenv.config();
 
 const app = express();
@@ -23,6 +25,8 @@ mongoose
 app.use("/api/auth", authRoutes);
 app.use("/api/news", newsRoutes);
 app.use("/api/careers", jobRoutes); // Added this line to include job routes
+app.use("/api/contacts", contactRoutes);
+app.use("/api/applications", ApplicationsRoutes); // Added this line to include application routes
 
 // Base Route for testing
 app.get("/", (req, res) => {

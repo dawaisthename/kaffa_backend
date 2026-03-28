@@ -11,10 +11,10 @@ const { protect } = require("../middleware/authMiddleware");
 
 // Public can view news
 router.get("/", getNews);
+router.get("/:id", getNewsById);
 
 // Only Admin can create or delete
 router.post("/", protect, createNews);
-router.get("/:id", getNewsById);
 // Add this line to your existing routes
 router.put("/:id", protect, updateNews);
 router.delete("/:id", protect, deleteNews);
