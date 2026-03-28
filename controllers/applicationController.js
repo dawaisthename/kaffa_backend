@@ -1,6 +1,6 @@
 const Application = require("../models/Application");
 const fs = require("fs"); // Import the file system module
-
+const sendEmail = require("../utils/sendEmail");
 // Submit application
 exports.createApplication = async (req, res) => {
   try {
@@ -8,11 +8,43 @@ exports.createApplication = async (req, res) => {
       fullName: req.body.fullName,
       email: req.body.email,
       position: req.body.position,
-      coverLetter: req.body.coverLetter,
-      resumePath: req.file.path, // Path to the uploaded file
+      coverLetter: req.body.coverLetter || req.body.message,
+      resumePath: req.file.path,
     });
 
     const saved = await newApplication.save();
+
+    // --- EMAIL NOTIFICATION LOGIC ---
+    try {
+      await sendEmail({
+        to: "career@kaffa-holding.com",
+        subject: `New Job Application: ${req.body.position} - ${req.body.fullName}`,
+        html: `
+          <div style="font-family: sans-serif; line-height: 1.6; color: #0a1622;">
+            <h2 style="color: #c5a35d;">New Application Received</h2>
+            <p><strong>Applicant:</strong> ${req.body.fullName}</p>
+            <p><strong>Email:</strong> ${req.body.email}</p>
+            <p><strong>Position:</strong> ${req.body.position}</p>
+            <p><strong>Message:</strong><br/>${req.body.coverLetter || req.body.message || "No message provided."}</p>
+            <hr/>
+            <p style="font-size: 12px; color: #888;">This application has been saved to the Admin Dashboard.</p>
+          </div>
+        `,
+        attachments: [
+          {
+            filename: req.file.originalname,
+            path: req.file.path, // Sends the actual file to the HR email
+          },
+        ],
+      });
+    } catch (mailErr) {
+      console.error(
+        "Email failed to send, but application was saved:",
+        mailErr,
+      );
+    }
+    // --------------------------------
+
     res.status(201).json(saved);
   } catch (err) {
     res.status(500).json({ error: "Application submission failed" });
