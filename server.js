@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const mongoose = require("mongoose"); // 1. Added Mongoose
+const seedAdmin = require("./seedAdmin"); // 1. Import seedAdmin function
 const authRoutes = require("./routes/authRoutes");
 const newsRoutes = require("./routes/newsRoutes");
 const jobRoutes = require("./routes/jobRoutes");
@@ -18,7 +19,12 @@ app.use(express.json());
 // 2. Database Connection Logic
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ MongoDB Connected Successfully"))
+  .then(async () => {
+    console.log("✅ MongoDB Connected Successfully");
+
+    // Seed admin after DB connection
+    await seedAdmin();
+  })
   .catch((err) => console.error("❌ MongoDB Connection Error:", err));
 
 // --- ADD THIS LINE ---

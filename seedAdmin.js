@@ -7,26 +7,23 @@ const seedAdmin = async () => {
     await mongoose.connect(process.env.MONGO_URI);
     console.log("Connected to MongoDB for seeding...");
 
-    // Check if admin already exists
     const adminExists = await User.findOne({ username: "admin" });
     if (adminExists) {
       console.log("Admin user already exists. Skipping seed.");
-      process.exit();
+      return; // Don't exit here
     }
 
-    // Create new admin
     const admin = new User({
       username: "admin",
-      password: "your_secure_password", // The Model's .pre('save') hook will hash this!
+      password: "your_secure_password",
     });
 
     await admin.save();
     console.log("Admin user created successfully!");
-    process.exit();
   } catch (error) {
     console.error(`Error: ${error.message}`);
-    process.exit(1);
   }
 };
 
-seedAdmin();
+// Export the function without immediately calling it
+module.exports = seedAdmin;
