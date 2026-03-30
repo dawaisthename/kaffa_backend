@@ -37,14 +37,13 @@ exports.createJob = async (req, res) => {
 exports.updateJob = async (req, res) => {
   try {
     const updatedJob = await Job.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
+      returnDocument: "after",
     });
     res.json(updatedJob);
   } catch (error) {
     res.status(400).json({ message: "Update failed" });
   }
 };
-
 exports.deleteJob = async (req, res) => {
   try {
     await Job.findByIdAndDelete(req.params.id);
