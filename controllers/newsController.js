@@ -1,68 +1,94 @@
 const News = require("../models/News");
 
+// Utility function for error logging
+const handleError = (res, error, message = "Server Error", status = 500) => {
+  console.error(error);
+  return res.status(status).json({ message });
+};
+
 // Get all news (Public)
 exports.getNews = async (req, res) => {
   try {
-    const news = await News.find().sort({ createdAt: -1 }); // Newest first
+    const news = await News.find().sort({ createdAt: -1 }).lean(); // Newest first
     res.json(news);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching news" });
+    handleError(res, error, "Error fetching news");
   }
 };
+
 // Get single news item by ID
 exports.getNewsById = async (req, res) => {
-  console.log("Fetching news item with ID:", req.params.id);
   try {
-    const newsItem = await News.findById(req.params.id);
-    if (!newsItem) return res.status(404).json({ message: "Not found" });
+    const newsItem = await News.findById(req.params.id).lean();
+    if (!newsItem) return res.status(404).json({ message: "News not found" });
     res.json(newsItem);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching article" });
+    handleError(res, error, "Error fetching news item");
   }
 };
+
 // Create news (Protected)
 exports.createNews = async (req, res) => {
   try {
     const { title, content, category } = req.body;
+
+    // Simple input validation
+    if (!title || !content || !category) {
+      return res
+        .status(400)
+        .json({ message: "Title, content, and category are required" });
+    }
+
     const newPost = new News({
       title,
       content,
       category,
-      author: req.user, // Added by our protect middleware
+      author: req.user._id, // Ensure only the user ID is stored
     });
+
     const savedPost = await newPost.save();
     res.status(201).json(savedPost);
   } catch (error) {
-    res.status(400).json({ message: "Error creating post" });
+    handleError(res, error, "Error creating news", 400);
   }
 };
+
 // Update existing news (Protected)
 exports.updateNews = async (req, res) => {
   try {
     const { title, content, category } = req.body;
 
-    const updatedNews = await News.findByIdAndUpdate(
-      req.params.id,
-      { title, content, category },
-      { new: true, runValidators: true }, // returns the updated document
-    );
+    const news = await News.findById(req.params.id);
+    if (!news) return res.status(404).json({ message: "News not found" });
 
-    if (!updatedNews) {
-      return res.status(404).json({ message: "News post not found" });
-    }
+    // Update fields
+    news.title = title || news.title;
+    news.content = content || news.content;
+    news.category = category || news.category;
 
+    const updatedNews = await news.save();
     res.json(updatedNews);
   } catch (error) {
-    res.status(400).json({ message: "Error updating post" });
+    handleError(res, error, "Error updating news", 400);
   }
 };
 
 // Delete news (Protected)
 exports.deleteNews = async (req, res) => {
   try {
-    await News.findByIdAndDelete(req.params.id);
+    const news = await News.findById(req.params.id);
+    if (!news) return res.status(404).json({ message: "News not found" });
+
+    // Authorization check: only author can delete
+    if (news.author.toString() !== req.user._id.toString()) {
+      return res
+        .status(403)
+        .json({ message: "Not authorized to delete this post" });
+    }
+
+    await news.remove();
     res.json({ message: "Post removed" });
   } catch (error) {
-    res.status(400).json({ message: "Error deleting post" });
+    handleError(res, error, "Error deleting news", 400);
   }
 };

@@ -7,7 +7,7 @@ const newsSchema = new mongoose.Schema(
     category: {
       type: String,
       required: true,
-      enum: ["Investment", "Company News", "Insights", "Press"],
+      enum: ["Investments", "Company News", "Insights", "Press"],
       default: "News",
     },
     author: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // Tracks who posted it
