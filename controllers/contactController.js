@@ -50,6 +50,7 @@ exports.createMessage = async (req, res) => {
             </p>
           </div>
         `,
+        replyTo: email,
       });
     } catch (mailErr) {
       console.error("Database saved, but notification email failed:", mailErr);

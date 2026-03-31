@@ -3,6 +3,9 @@ const fs = require("fs"); // Import the file system module
 const sendEmail = require("../utils/sendEmail");
 // Submit application
 exports.createApplication = async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: "Resume is required" });
+  }
   try {
     const newApplication = new Application({
       fullName: req.body.fullName,
@@ -30,6 +33,7 @@ exports.createApplication = async (req, res) => {
             <p style="font-size: 12px; color: #888;">This application has been saved to the Admin Dashboard.</p>
           </div>
         `,
+        replyTo: req.body.email,
         attachments: [
           {
             filename: req.file.originalname,
