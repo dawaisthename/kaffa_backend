@@ -1,11 +1,8 @@
 const nodemailer = require("nodemailer");
 
 const sendEmail = async (options) => {
-  // Use GoDaddy/Microsoft 365 or Gmail SMTP settings
   const transporter = nodemailer.createTransport({
-    host: "smtp.office365.com", 
-    port: 587,
-    secure: false,
+    service: "gmail",
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
@@ -17,9 +14,11 @@ const sendEmail = async (options) => {
     to: options.to,
     subject: options.subject,
     html: options.html,
+    attachments: options.attachments || [],
+    replyTo: options.replyTo, // <--- ADD THIS LINE
   };
 
-  await transporter.sendEmail(mailOptions);
+  await transporter.sendMail(mailOptions);
 };
 
 module.exports = sendEmail;
