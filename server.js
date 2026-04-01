@@ -9,6 +9,7 @@ const jobRoutes = require("./routes/jobRoutes");
 const contactRoutes = require("./routes/contactRoutes");
 const ApplicationsRoutes = require("./routes/applicationsRoutes"); // Import job routes
 const PortfolioRoutes = require("./routes/portfolioRoutes"); // Import portfolio routes
+const TeamRoutes = require("./routes/teamRoutes"); // Import team routes
 dotenv.config();
 
 const app = express();
@@ -37,6 +38,7 @@ app.use("/api/portfolio", PortfolioRoutes);
 app.use("/api/careers", jobRoutes);
 app.use("/api/contacts", contactRoutes);
 app.use("/api/applications", ApplicationsRoutes);
+app.use("/api/team", TeamRoutes);
 // Base Route for testing
 app.get("/", (req, res) => {
   res.send("Kaffa API is live...");

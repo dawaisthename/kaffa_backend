@@ -79,14 +79,7 @@ exports.deleteNews = async (req, res) => {
     const news = await News.findById(req.params.id);
     if (!news) return res.status(404).json({ message: "News not found" });
 
-    // Authorization check: only author can delete
-    if (news.author.toString() !== req.user._id.toString()) {
-      return res
-        .status(403)
-        .json({ message: "Not authorized to delete this post" });
-    }
-
-    await news.remove();
+    await news.deleteOne();
     res.json({ message: "Post removed" });
   } catch (error) {
     handleError(res, error, "Error deleting news", 400);
