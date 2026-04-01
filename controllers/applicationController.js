@@ -29,7 +29,7 @@ exports.createApplication = async (req, res) => {
     }
 
     try {
-      await sendEmail({
+      const info = await sendEmail({
         to: recipientEmail,
         subject: `New Job Application: ${req.body.position} - ${req.body.fullName}`,
         html: `
@@ -50,6 +50,12 @@ exports.createApplication = async (req, res) => {
             path: req.file.path, // Sends the actual file to the HR email
           },
         ],
+      });
+      console.log("Application mail delivery:", {
+        to: recipientEmail,
+        accepted: info.accepted,
+        rejected: info.rejected,
+        response: info.response,
       });
     } catch (mailErr) {
       console.error(

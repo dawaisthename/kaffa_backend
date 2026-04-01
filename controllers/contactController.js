@@ -38,7 +38,7 @@ exports.createMessage = async (req, res) => {
     }
 
     try {
-      await sendEmail({
+      const info = await sendEmail({
         to: recipientEmail,
         subject: `New ${inquiryType} Inquiry: ${fullName}`,
         html: `
@@ -62,6 +62,12 @@ exports.createMessage = async (req, res) => {
           </div>
         `,
         replyTo: email,
+      });
+      console.log("Contact mail delivery:", {
+        to: recipientEmail,
+        accepted: info.accepted,
+        rejected: info.rejected,
+        response: info.response,
       });
     } catch (mailErr) {
       console.error("Database saved, but notification email failed:", mailErr);
