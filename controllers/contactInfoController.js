@@ -24,6 +24,17 @@ exports.getAllContacts = async (req, res) => {
       .json({ message: "Error fetching contacts", error: error.message });
   }
 };
+exports.FooterContact = async (req, res) => {
+  console.log("Fetching footer contact information...");
+  try {
+    const contacts = await ContactInfo.find({ country: "Ethiopia" });
+    res.status(200).json(contacts);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error fetching contacts", error: error.message });
+  }
+};
 
 // 3. Update an existing contact by ID
 exports.updateContact = async (req, res) => {
