@@ -1,6 +1,12 @@
 PORT=5000
-MONGO_URI=database connection
+
 JWT_SECRET=your_secret_key
 NODE_ENV=development
 EMAIL_USER=example@gmail.com
 EMAIL_PASS=password
+EMAIL_FROM=example@gmail.com
+CONTACT_EMAIL_GENERAL=info@kaffa-holding.com
+CONTACT_EMAIL_INVESTMENTS=investments@kaffa-holding.com
+CONTACT_EMAIL_CAREERS=career@kaffa-holding.com
+ADMIN_RECOVERY_EMAIL=admin-recovery@example.com
+ADMIN_RESET_BASE_URL=http://localhost:5173/admin-portal-kaffa

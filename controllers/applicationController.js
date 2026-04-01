@@ -1,6 +1,9 @@
 const Application = require("../models/Application");
 const fs = require("fs"); // Import the file system module
 const sendEmail = require("../utils/sendEmail");
+
+const getApplicationRecipientEmail = () =>
+  process.env.CONTACT_EMAIL_CAREERS || process.env.CONTACT_EMAIL_GENERAL;
 // Submit application
 exports.createApplication = async (req, res) => {
   if (!req.file) {
@@ -18,9 +21,16 @@ exports.createApplication = async (req, res) => {
     const saved = await newApplication.save();
 
     // --- EMAIL NOTIFICATION LOGIC ---
+    const recipientEmail = getApplicationRecipientEmail();
+    if (!recipientEmail) {
+      return res.status(500).json({
+        error: "Application email destination is not configured",
+      });
+    }
+
     try {
       await sendEmail({
-        to: "career@kaffa-holding.com",
+        to: recipientEmail,
         subject: `New Job Application: ${req.body.position} - ${req.body.fullName}`,
         html: `
           <div style="font-family: sans-serif; line-height: 1.6; color: #0a1622;">

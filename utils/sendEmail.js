@@ -9,8 +9,9 @@ const sendEmail = async (options) => {
     },
   });
 
+  const fromEmail = process.env.EMAIL_FROM || process.env.EMAIL_USER;
   const mailOptions = {
-    from: `"Kaffa Portal" <${process.env.EMAIL_USER}>`,
+    from: `"Kaffa Portal" <${fromEmail}>`,
     to: options.to,
     subject: options.subject,
     html: options.html,

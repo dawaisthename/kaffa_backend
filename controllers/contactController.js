@@ -1,6 +1,19 @@
 const Contact = require("../models/Contact");
 const sendEmail = require("../utils/sendEmail"); // Added this import
 
+const getRecipientEmail = (inquiryType = "") => {
+  const type = inquiryType.toLowerCase();
+  if (type.includes("investment")) {
+    return (
+      process.env.CONTACT_EMAIL_INVESTMENTS || process.env.CONTACT_EMAIL_GENERAL
+    );
+  }
+  if (type.includes("career")) {
+    return process.env.CONTACT_EMAIL_CAREERS || process.env.CONTACT_EMAIL_GENERAL;
+  }
+  return process.env.CONTACT_EMAIL_GENERAL;
+};
+
 // Save message from public form
 exports.createMessage = async (req, res) => {
   try {
@@ -17,13 +30,11 @@ exports.createMessage = async (req, res) => {
     const savedMessage = await newMessage.save();
 
     // --- DYNAMIC EMAIL ROUTING LOGIC ---
-    let recipientEmail = "info@kaffa-holding.com"; // Default
-
-    // Logic to route based on inquiry type
-    if (inquiryType && inquiryType.toLowerCase().includes("investment")) {
-      recipientEmail = "investments@kaffa-holding.com";
-    } else if (inquiryType && inquiryType.toLowerCase().includes("career")) {
-      recipientEmail = "career@kaffa-holding.com";
+    const recipientEmail = getRecipientEmail(inquiryType);
+    if (!recipientEmail) {
+      return res.status(500).json({
+        error: "Contact email destination is not configured",
+      });
     }
 
     try {
